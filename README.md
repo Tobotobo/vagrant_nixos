@@ -1,9 +1,27 @@
 # vagrant_nixos
 
 ```
+winget install Oracle.VirtualBox
+winget install Hashicorp.Vagrant
+```
+
+```
 vagrant up
 vagrant ssh
 ```
+
+```
+>vagrant ssh
+Last login: Wed Oct 18 14:40:42 2023 from 10.0.2.2
+
+[vagrant@nixbox:~]$ docker --version
+Docker version 20.10.25, build v20.10.25
+
+[vagrant@nixbox:~]$ docker-compose --version
+Docker Compose version 2.18.1
+```
+※課題：docker は使えるようになるが /vagrant のマウントが外れてしまう
+
 
 ```
 Password:vagrant
@@ -26,43 +44,17 @@ node --version
 - 再起動：`vagrant reload`
 - 削除：`vagrant destroy`
 ```
-
+vagrant reload --provision
 vagrant status
 vagrant destroy
 ```
 
-/etc/nixos/configuration.nix
+【まとめ】Vagrant コマンド一覧  
+https://qiita.com/oreo3/items/4054a4120ccc249676d9
 
+Docker on NixOS  
+https://nixos.wiki/wiki/Docker
 
-Docker有効化　※とりあえず有効化してみただけ※vagrant sshでログイン後
-```
-sudo nano /etc/nixos/custom-configuration.nix 
-sudo nixos-rebuild switch
-```
-```
-～～～～～～～～
-{
-  virtualisation.docker.enable = true;
-}
-```
+Docker-compose on nixos  
+https://discourse.nixos.org/t/docker-compose-on-nixos/17502
 
-↓を改造すれば自動化できると思われ
-```
-Vagrant.configure("2") do |config|
-  config.vm.box = "nixos/nixos-x86_64"  # ベースとなるNixOSのbox
-
-  # SSHでの接続設定
-  config.ssh.insert_key = false
-  config.ssh.username = "root"
-  config.ssh.password = "root"
-
-  # configuration.nixをコピーするプロビジョニングスクリプト
-  config.vm.provision "file", source: "./path/to/your/configuration.nix", destination: "/etc/nixos/configuration.nix"
-
-  # NixOSのリビルド
-  config.vm.provision "shell", inline: <<-SHELL
-    nixos-rebuild switch
-  SHELL
-end
-
-```
